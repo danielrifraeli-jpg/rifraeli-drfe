@@ -116,7 +116,7 @@ export default function AIPanel({ state }: AIPanelProps) {
       // Headers like ### or ##
       if (trimmed.startsWith("###")) {
         return (
-          <h5 key={idx} className="text-sm font-bold text-white mt-5 mb-2.5 flex items-center gap-1.5 border-b border-[#222222] pb-1 font-mono uppercase tracking-wider">
+          <h5 key={idx} className="text-sm font-bold text-theme-title mt-5 mb-2.5 flex items-center gap-1.5 border-b border-theme-card-border pb-1 font-mono uppercase tracking-wider">
             <CheckCircle className="h-4 w-4 text-[#d4af37]" />
             {trimmed.replace(/^###\s*/, "")}
           </h5>
@@ -124,7 +124,7 @@ export default function AIPanel({ state }: AIPanelProps) {
       }
       if (trimmed.startsWith("##") || trimmed.startsWith("#")) {
         return (
-          <h4 key={idx} className="text-base font-extrabold text-[#d4af37] mt-7 mb-3.5 flex items-center gap-2 border-b border-[#222222] pb-1.5 font-mono uppercase tracking-widest">
+          <h4 key={idx} className="text-base font-extrabold text-[#d4af37] mt-7 mb-3.5 flex items-center gap-2 border-b border-theme-card-border pb-1.5 font-mono uppercase tracking-widest">
             <span className="w-1.5 h-4 bg-[#d4af37] rounded" />
             {trimmed.replace(/^##?\s*/, "")}
           </h4>
@@ -136,7 +136,7 @@ export default function AIPanel({ state }: AIPanelProps) {
         // Handle bolding inside bullets like "**Texto**: rest"
         const content = trimmed.replace(/^[-*]\s*/, "");
         return (
-          <li key={idx} className="text-gray-300 text-sm ml-5 list-disc mb-1.5 pl-1 leading-relaxed">
+          <li key={idx} className="text-theme-text text-sm ml-5 list-disc mb-1.5 pl-1 leading-relaxed">
             {parseBoldText(content)}
           </li>
         );
@@ -148,7 +148,7 @@ export default function AIPanel({ state }: AIPanelProps) {
       }
 
       return (
-        <p key={idx} className="text-gray-300 text-sm leading-relaxed mb-2.5">
+        <p key={idx} className="text-theme-text text-sm leading-relaxed mb-2.5">
           {parseBoldText(trimmed)}
         </p>
       );
@@ -172,7 +172,7 @@ export default function AIPanel({ state }: AIPanelProps) {
   return (
     <div className="space-y-6">
       {/* Advisor Welcome Panel */}
-      <div className="bg-[#111111] text-white p-6 rounded border border-[#222222] relative overflow-hidden">
+      <div className="bg-theme-card text-theme-title p-6 rounded border border-theme-card-border relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-[#d4af37]/5 rounded-full filter blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 z-10 relative">
@@ -182,7 +182,7 @@ export default function AIPanel({ state }: AIPanelProps) {
               <span>Diagnóstico Ativo</span>
             </div>
             <h3 className="text-xl font-bold tracking-tight serif-heading uppercase tracking-wider">Milhão Advisor 🧠</h3>
-            <p className="text-gray-400 text-sm leading-relaxed font-sans">
+            <p className="text-theme-muted text-sm leading-relaxed font-sans">
               Consolide todos os seus dados de despesas, investimentos e metas financeiras. Nosso assistente inteligente fará uma varredura completa da sua saúde financeira para traçar o melhor plano estratégico rumo ao seu milhão.
             </p>
           </div>
@@ -209,14 +209,14 @@ export default function AIPanel({ state }: AIPanelProps) {
 
       {/* Advice Display Area */}
       {loading && (
-        <div className="bg-[#111111] p-8 rounded border border-[#222222] flex flex-col items-center justify-center py-16 space-y-4">
+        <div className="bg-theme-card p-8 rounded border border-theme-card-border flex flex-col items-center justify-center py-16 space-y-4">
           <div className="relative">
-            <div className="h-12 w-12 border-4 border-[#222222] border-t-[#d4af37] rounded-full animate-spin" />
+            <div className="h-12 w-12 border-4 border-theme-card-border border-t-[#d4af37] rounded-full animate-spin" />
             <Brain className="h-6 w-6 text-[#d4af37] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           </div>
           <div className="text-center">
-            <p className="font-bold text-white text-sm font-mono uppercase tracking-wider">Consultando Inteligência...</p>
-            <p className="text-xs text-gray-500 mt-1 max-w-xs leading-normal font-mono">
+            <p className="font-bold text-theme-title text-sm font-mono uppercase tracking-wider">Consultando Inteligência...</p>
+            <p className="text-xs text-theme-muted mt-1 max-w-xs leading-normal font-mono">
               Processando fluxo de caixa, fundo de segurança e alocação de ativos...
             </p>
           </div>
@@ -234,15 +234,15 @@ export default function AIPanel({ state }: AIPanelProps) {
       )}
 
       {advice && !loading && (
-        <div className="bg-[#111111] p-6 md:p-8 rounded border border-[#222222] space-y-1">
-          <div className="flex items-center justify-between border-b border-[#222222] pb-4 mb-5">
+        <div className="bg-theme-card p-6 md:p-8 rounded border border-theme-card-border space-y-1">
+          <div className="flex items-center justify-between border-b border-theme-card-border pb-4 mb-5">
             <div className="flex items-center gap-2.5">
               <Sparkles className="h-5 w-5 text-[#d4af37]" />
-              <h4 className="font-bold text-white text-sm uppercase tracking-wider font-mono">Relatório de Diagnóstico Financeiro</h4>
+              <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider font-mono">Relatório de Diagnóstico Financeiro</h4>
             </div>
             <button
               onClick={handleGetAdvice}
-              className="p-2 hover:bg-[#1c1c1c] border border-[#222222] text-gray-400 rounded transition cursor-pointer"
+              className="p-2 hover:bg-theme-hover border border-theme-card-border text-theme-muted rounded transition cursor-pointer"
               title="Gerar outro diagnóstico"
             >
               <RefreshCw className="h-4.5 w-4.5" />
@@ -257,12 +257,12 @@ export default function AIPanel({ state }: AIPanelProps) {
 
       {/* Placeholder before asking */}
       {!advice && !loading && !error && (
-        <div className="bg-[#111111] p-12 rounded border border-[#222222] flex flex-col items-center justify-center text-center max-w-xl mx-auto py-16">
-          <div className="p-4 bg-[#0a0a0a] text-gray-500 rounded border border-[#222222] mb-4">
-            <HelpCircle className="h-10 w-10 text-gray-600" />
+        <div className="bg-theme-card p-12 rounded border border-theme-card-border flex flex-col items-center justify-center text-center max-w-xl mx-auto py-16">
+          <div className="p-4 bg-theme-bg text-theme-muted rounded border border-theme-card-border mb-4">
+            <HelpCircle className="h-10 w-10 text-theme-muted" />
           </div>
-          <h4 className="font-bold text-white text-sm font-mono uppercase tracking-wider">Nenhum Diagnóstico Solicitado</h4>
-          <p className="text-xs text-gray-400 mt-1.5 leading-relaxed max-w-xs font-sans">
+          <h4 className="font-bold text-theme-title text-sm font-mono uppercase tracking-wider">Nenhum Diagnóstico Solicitado</h4>
+          <p className="text-xs text-theme-muted mt-1.5 leading-relaxed max-w-xs font-sans">
             Clique no botão acima para submeter seu orçamento ao Milhão Advisor de IA e obter recomendações detalhadas baseadas nos seus números.
           </p>
         </div>

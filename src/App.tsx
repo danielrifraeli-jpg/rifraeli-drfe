@@ -49,6 +49,14 @@ export default function App() {
     localStorage.setItem("rifraeli_theme", nextTheme);
   };
 
+  useEffect(() => {
+    if (theme === "light") {
+      document.documentElement.classList.add("light-theme");
+    } else {
+      document.documentElement.classList.remove("light-theme");
+    }
+  }, [theme]);
+
   const [session, setSession] = useState<UserSession | null>(null);
   const [data, setData] = useState<FinancialState | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");

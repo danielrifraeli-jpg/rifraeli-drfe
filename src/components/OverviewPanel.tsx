@@ -119,31 +119,31 @@ export default function OverviewPanel({
       {/* 4 Quick Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Wealth */}
-        <div id="card-patrimonio" className="bg-[#111111] p-5 rounded border border-[#222222] flex flex-col justify-between transition hover:border-[#333333]">
+        <div id="card-patrimonio" className="bg-theme-card p-5 rounded border border-theme-card-border flex flex-col justify-between transition hover:border-theme-border">
           <div className="flex items-center justify-between">
-            <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Patrimônio Total</span>
+            <span className="text-theme-muted text-xs uppercase tracking-wider font-semibold">Patrimônio Total</span>
             <div className="p-2 bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 rounded">
               <DollarSign className="h-4 w-4" />
             </div>
           </div>
           <div className="mt-4">
             <h3 className="text-2xl font-bold font-mono text-[#d4af37]">{formatBRL(totalWealth)}</h3>
-            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
+            <p className="text-[10px] text-theme-muted mt-1 uppercase tracking-wider">
               Conta + Investido + Reserva
             </p>
           </div>
         </div>
 
         {/* Total Incomes */}
-        <div id="card-receitas" className="bg-[#111111] p-5 rounded border border-[#222222] flex flex-col justify-between transition hover:border-[#333333]">
+        <div id="card-receitas" className="bg-theme-card p-5 rounded border border-theme-card-border flex flex-col justify-between transition hover:border-theme-border">
           <div className="flex items-center justify-between">
-            <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Entradas Totais</span>
+            <span className="text-theme-muted text-xs uppercase tracking-wider font-semibold">Entradas Totais</span>
             <div className="p-2 bg-emerald-950/30 text-emerald-400 border border-emerald-900/20 rounded">
               <TrendingUp className="h-4 w-4" />
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-2xl font-bold font-mono text-white">{formatBRL(totalIncomes)}</h3>
+            <h3 className="text-2xl font-bold font-mono text-theme-title">{formatBRL(totalIncomes)}</h3>
             <p className="text-[10px] text-emerald-400 mt-1 font-mono uppercase tracking-wider flex items-center gap-0.5">
               <ArrowUpRight className="h-3 w-3" />
               <span>Salários, dividendos, extras</span>
@@ -152,15 +152,15 @@ export default function OverviewPanel({
         </div>
 
         {/* Total Expenses */}
-        <div id="card-despesas" className="bg-[#111111] p-5 rounded border border-[#222222] flex flex-col justify-between transition hover:border-[#333333]">
+        <div id="card-despesas" className="bg-theme-card p-5 rounded border border-theme-card-border flex flex-col justify-between transition hover:border-theme-border">
           <div className="flex items-center justify-between">
-            <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Saídas Totais</span>
+            <span className="text-theme-muted text-xs uppercase tracking-wider font-semibold">Saídas Totais</span>
             <div className="p-2 bg-rose-950/30 text-rose-400 border border-rose-900/20 rounded">
               <TrendingDown className="h-4 w-4" />
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-2xl font-bold font-mono text-white">{formatBRL(totalExpenses)}</h3>
+            <h3 className="text-2xl font-bold font-mono text-theme-title">{formatBRL(totalExpenses)}</h3>
             <p className="text-[10px] text-rose-400 mt-1 font-mono uppercase tracking-wider flex items-center gap-0.5">
               <ArrowDownRight className="h-3 w-3" />
               <span>Gastos gerais debitados</span>
@@ -169,16 +169,16 @@ export default function OverviewPanel({
         </div>
 
         {/* Total Invested */}
-        <div id="card-investido" className="bg-[#111111] p-5 rounded border border-[#222222] flex flex-col justify-between transition hover:border-[#333333]">
+        <div id="card-investido" className="bg-theme-card p-5 rounded border border-theme-card-border flex flex-col justify-between transition hover:border-theme-border">
           <div className="flex items-center justify-between">
-            <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Total Alocado</span>
+            <span className="text-theme-muted text-xs uppercase tracking-wider font-semibold">Total Alocado</span>
             <div className="p-2 bg-blue-950/30 text-blue-400 border border-blue-900/20 rounded">
               <Briefcase className="h-4 w-4" />
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-2xl font-bold font-mono text-white">{formatBRL(totalInvested)}</h3>
-            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
+            <h3 className="text-2xl font-bold font-mono text-theme-title">{formatBRL(totalInvested)}</h3>
+            <p className="text-[10px] text-theme-muted mt-1 uppercase tracking-wider">
               Renda Fixa, Ações e FIIs
             </p>
           </div>
@@ -188,21 +188,21 @@ export default function OverviewPanel({
       {/* Main Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cash Flow Graph */}
-        <div id="chart-fluxo-caixa" className="bg-[#111111] p-5 rounded border border-[#222222] lg:col-span-2">
+        <div id="chart-fluxo-caixa" className="bg-theme-card p-5 rounded border border-theme-card-border lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider serif-heading">Fluxo de Caixa Mensal</h4>
-            <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest font-mono">Auditoria de Período</span>
+            <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Fluxo de Caixa Mensal</h4>
+            <span className="text-[10px] font-medium text-theme-muted uppercase tracking-widest font-mono">Auditoria de Período</span>
           </div>
           <div className="h-80 w-full">
             {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f1f1f" />
-                  <XAxis dataKey="name" stroke="#555555" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#555555" fontSize={11} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-main)" />
+                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+                  <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} />
                   <Tooltip
                     formatter={(value: any) => [formatBRL(Number(value)), ""]}
-                    contentStyle={{ backgroundColor: "#0a0a0a", borderRadius: "4px", border: "1px solid #222222", color: "white" }}
+                    contentStyle={{ backgroundColor: "var(--bg-input)", borderRadius: "4px", border: "1px solid var(--border-card)", color: "var(--text-main)" }}
                   />
                   <Legend iconType="circle" />
                   <Bar dataKey="Receitas" fill="#d4af37" radius={[2, 2, 0, 0]} />
@@ -210,7 +210,7 @@ export default function OverviewPanel({
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-500">
+              <div className="h-full flex flex-col items-center justify-center text-theme-muted">
                 <p className="text-sm font-mono uppercase tracking-wider">Sem dados de transações históricos.</p>
               </div>
             )}
@@ -218,9 +218,9 @@ export default function OverviewPanel({
         </div>
 
         {/* Investment Allocation Graph */}
-        <div id="chart-alocacao" className="bg-[#111111] p-5 rounded border border-[#222222]">
+        <div id="chart-alocacao" className="bg-theme-card p-5 rounded border border-theme-card-border">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider serif-heading">Alocação de Ativos</h4>
+            <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Alocação de Ativos</h4>
             <button
               onClick={() => onNavigateToTab("investments")}
               className="text-xs font-semibold text-[#d4af37] hover:text-[#c49f27] hover:underline uppercase tracking-wider font-mono"
@@ -245,25 +245,28 @@ export default function OverviewPanel({
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: any) => [formatBRL(Number(value)), ""]} />
+                  <Tooltip
+                    formatter={(value: any) => [formatBRL(Number(value)), ""]}
+                    contentStyle={{ backgroundColor: "var(--bg-input)", borderRadius: "4px", border: "1px solid var(--border-card)", color: "var(--text-main)" }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex flex-col items-center justify-center text-gray-500">
+              <div className="flex flex-col items-center justify-center text-theme-muted">
                 <p className="text-xs font-mono uppercase tracking-wider text-center">Nenhum investimento indexado.</p>
               </div>
             )}
             {pieData.length > 0 && (
               <div className="absolute flex flex-col items-center justify-center">
-                <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Total</span>
-                <span className="text-sm font-bold font-mono text-white">{formatBRL(totalInvested)}</span>
+                <span className="text-[10px] text-theme-muted uppercase tracking-widest font-mono">Total</span>
+                <span className="text-sm font-bold font-mono text-theme-title">{formatBRL(totalInvested)}</span>
               </div>
             )}
           </div>
           {/* Pie Chart Legend */}
           <div className="mt-2 space-y-1.5 max-h-24 overflow-y-auto">
             {pieData.map((item, index) => (
-              <div key={item.name} className="flex items-center justify-between text-xs text-gray-400">
+              <div key={item.name} className="flex items-center justify-between text-xs text-theme-muted">
                 <div className="flex items-center gap-2">
                   <span
                     className="w-2 h-2 rounded-full"
@@ -271,7 +274,7 @@ export default function OverviewPanel({
                   />
                   <span className="font-medium">{item.name}</span>
                 </div>
-                <span className="font-bold font-mono">
+                <span className="font-bold font-mono text-theme-title">
                   {((item.value / totalInvested) * 100).toFixed(1)}%
                 </span>
               </div>
@@ -283,10 +286,10 @@ export default function OverviewPanel({
       {/* Emergency Reserve & Last Transactions Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Emergency Reserve Overview Card */}
-        <div id="card-reserva-detalhes" className="bg-[#111111] p-5 rounded border border-[#222222] flex flex-col justify-between">
+        <div id="card-reserva-detalhes" className="bg-theme-card p-5 rounded border border-theme-card-border flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-bold text-white text-sm uppercase tracking-wider serif-heading">Reserva de Segurança</h4>
+              <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Reserva de Segurança</h4>
               <button
                 onClick={() => onNavigateToTab("goals")}
                 className="text-xs font-semibold text-[#d4af37] hover:text-[#c49f27] hover:underline uppercase tracking-wider font-mono"
@@ -294,17 +297,17 @@ export default function OverviewPanel({
                 Configurar
               </button>
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed mb-4">
-              A reserva ideal de liquidez deve cobrir <strong className="text-[#d4af37]">{emergencyReserve.monthlyExpenseFactor} meses</strong> do seu custo de vida médio mensal avaliado em <strong className="text-white">{formatBRL(avgMonthlyExpense)}</strong>.
+            <p className="text-xs text-theme-text leading-relaxed mb-4">
+              A reserva ideal de liquidez deve cobrir <strong className="text-[#d4af37]">{emergencyReserve.monthlyExpenseFactor} meses</strong> do seu custo de vida médio mensal avaliado em <strong className="text-theme-title">{formatBRL(avgMonthlyExpense)}</strong>.
             </p>
 
-            <div className="grid grid-cols-2 gap-4 mb-5 bg-[#181818] p-4 rounded border border-[#252525]">
+            <div className="grid grid-cols-2 gap-4 mb-5 bg-theme-bg p-4 rounded border border-theme-card-border">
               <div>
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider block font-mono">Acumulado</span>
+                <span className="text-[10px] text-theme-muted uppercase tracking-wider block font-mono">Acumulado</span>
                 <span className="text-lg font-bold font-mono text-emerald-400">{formatBRL(emergencyAmount)}</span>
               </div>
               <div>
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider block font-mono">Meta Blindada</span>
+                <span className="text-[10px] text-theme-muted uppercase tracking-wider block font-mono">Meta Blindada</span>
                 <span className="text-lg font-bold font-mono text-[#d4af37]">{formatBRL(targetReserve)}</span>
               </div>
             </div>
@@ -312,12 +315,12 @@ export default function OverviewPanel({
             {/* Progress Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-gray-400 font-mono text-[10px] uppercase tracking-wider">Cobertura Calculada</span>
+                <span className="text-theme-muted font-mono text-[10px] uppercase tracking-wider">Cobertura Calculada</span>
                 <span className="text-[#d4af37] font-bold font-mono">
                   {reserveProgressPercent.toFixed(1)}%
                 </span>
               </div>
-              <div className="w-full h-2 bg-[#222222] rounded overflow-hidden">
+              <div className="w-full h-2 bg-theme-bg border border-theme-card-border rounded overflow-hidden">
                 <div
                   className="h-full bg-[#d4af37] rounded transition-all duration-500"
                   style={{ width: `${Math.min(reserveProgressPercent, 100)}%` }}
@@ -326,18 +329,18 @@ export default function OverviewPanel({
             </div>
           </div>
 
-          <div className="mt-5 pt-4 border-t border-[#1f1f1f] flex items-center gap-2.5 text-xs text-gray-400">
+          <div className="mt-5 pt-4 border-t border-theme-border flex items-center gap-2.5 text-xs text-theme-muted">
             <AlertCircle className="h-4.5 w-4.5 text-[#d4af37] flex-shrink-0" />
             <span>
-              Sua provisão cobre atualmente <strong className="text-white font-semibold font-mono">{coverageMonths.toFixed(1)} meses</strong> do orçamento de custeio corrente.
+              Sua provisão cobre atualmente <strong className="text-theme-title font-semibold font-mono">{coverageMonths.toFixed(1)} meses</strong> do orçamento de custeio corrente.
             </span>
           </div>
         </div>
 
         {/* Recent Transactions List Card */}
-        <div id="card-recentes" className="bg-[#111111] p-5 rounded border border-[#222222]">
+        <div id="card-recentes" className="bg-theme-card p-5 rounded border border-theme-card-border">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider serif-heading">Últimos Lançamentos</h4>
+            <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Últimos Lançamentos</h4>
             <div className="flex items-center gap-2">
               <button
                 onClick={onOpenAddTransaction}
@@ -348,7 +351,7 @@ export default function OverviewPanel({
               </button>
               <button
                 onClick={() => onNavigateToTab("transactions")}
-                className="text-xs font-semibold text-gray-500 hover:text-gray-400 hover:underline uppercase tracking-wider font-mono"
+                className="text-xs font-semibold text-theme-muted hover:text-theme-title hover:underline uppercase tracking-wider font-mono"
               >
                 Todos
               </button>
@@ -360,7 +363,7 @@ export default function OverviewPanel({
               recentTransactions.map((t) => (
                 <div
                   key={t.id}
-                  className="flex items-center justify-between p-3 rounded hover:bg-[#161616] transition border border-[#222222]/50"
+                  className="flex items-center justify-between p-3 rounded hover:bg-theme-hover transition border border-theme-card-border/50"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -377,10 +380,10 @@ export default function OverviewPanel({
                       )}
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-500 font-mono block">
+                      <span className="text-[10px] text-theme-muted font-mono block">
                         {t.date.split("-").reverse().join("/")} • {t.category}
                       </span>
-                      <span className="text-white font-medium text-sm">{t.description}</span>
+                      <span className="text-theme-title font-medium text-sm">{t.description}</span>
                     </div>
                   </div>
                   <span
@@ -393,7 +396,7 @@ export default function OverviewPanel({
                 </div>
               ))
             ) : (
-              <div className="h-48 flex flex-col items-center justify-center text-gray-500 text-center">
+              <div className="h-48 flex flex-col items-center justify-center text-theme-muted text-center">
                 <p className="text-sm font-mono uppercase tracking-wider">Nenhum lançamento no extrato.</p>
               </div>
             )}
