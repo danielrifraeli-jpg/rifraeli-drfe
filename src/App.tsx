@@ -320,7 +320,7 @@ export default function App() {
         {/* Brand/Title */}
         <div className="mb-10">
           <h1 className="serif-heading text-2xl font-bold text-[#d4af37] tracking-tighter italic">RIFRAELI</h1>
-          <p className="text-[9px] tracking-[0.2em] text-theme-muted font-semibold">PRESTIGE FINANCE</p>
+          <p className="text-[9px] tracking-[0.2em] text-theme-muted font-semibold">FINANCEIRO</p>
         </div>
 
         {/* Nav list */}
@@ -402,7 +402,7 @@ export default function App() {
       <header className="md:hidden flex items-center justify-between h-16 bg-theme-header text-theme-title px-4 border-b border-theme-border z-30 no-print flex-shrink-0">
         <div className="flex flex-col">
           <span className="serif-heading text-lg font-bold text-[#d4af37] italic leading-none">RIFRAELI</span>
-          <span className="text-[8px] tracking-[0.1em] text-theme-muted mt-1 uppercase font-semibold">PRESTIGE FINANCE</span>
+          <span className="text-[8px] tracking-[0.1em] text-theme-muted mt-1 uppercase font-semibold">FINANCEIRO</span>
         </div>
 
         {/* Status Indicator */}
@@ -428,7 +428,7 @@ export default function App() {
           >
             <div className="mb-6">
               <h1 className="serif-heading text-xl font-bold text-[#d4af37] italic">RIFRAELI</h1>
-              <p className="text-[8px] tracking-[0.2em] text-theme-muted uppercase font-semibold">PRESTIGE FINANCE</p>
+              <p className="text-[8px] tracking-[0.2em] text-theme-muted uppercase font-semibold">FINANCEIRO</p>
             </div>
 
             <nav className="flex-1 space-y-4">
