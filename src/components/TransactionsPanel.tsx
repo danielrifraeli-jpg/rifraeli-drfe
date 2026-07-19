@@ -46,7 +46,9 @@ export default function TransactionsPanel({
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [dayFilter, setDayFilter] = useState("all");
   const [monthFilter, setMonthFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
 
   // State for modals
   const [showAddForm, setShowAddForm] = useState(isAddModalOpen);
@@ -68,10 +70,34 @@ export default function TransactionsPanel({
     }).format(val);
   };
 
-  // Extract all available months for the filter
-  const availableMonths = Array.from(
-    new Set(transactions.map((t) => t.date.substring(0, 7)))
-  ).sort().reverse();
+  // Extract all available years dynamically for the filter
+  const availableYears = Array.from(
+    new Set(transactions.map((t) => t.date.substring(0, 4)))
+  ).sort((a, b) => b.localeCompare(a));
+
+  if (availableYears.length === 0) {
+    availableYears.push(new Date().getFullYear().toString());
+  }
+
+  // Day options: "all" + "01" through "31"
+  const dayOptions = ["all", ...Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"))];
+
+  // Month options with Portuguese labels
+  const monthOptions = [
+    { value: "all", label: "Todos os Meses" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" },
+  ];
 
   // Handle opening Add Modal
   const openAddModal = () => {
@@ -142,23 +168,30 @@ export default function TransactionsPanel({
 
     const matchesType = typeFilter === "all" || t.type === typeFilter;
     const matchesCategory = categoryFilter === "all" || t.category === categoryFilter;
-    const matchesMonth = monthFilter === "all" || t.date.substring(0, 7) === monthFilter;
 
-    return matchesSearch && matchesType && matchesCategory && matchesMonth;
+    const tYear = t.date.substring(0, 4);
+    const tMonth = t.date.substring(5, 7);
+    const tDay = t.date.substring(8, 10);
+
+    const matchesDay = dayFilter === "all" || tDay === dayFilter;
+    const matchesMonth = monthFilter === "all" || tMonth === monthFilter;
+    const matchesYear = yearFilter === "all" || tYear === yearFilter;
+
+    return matchesSearch && matchesType && matchesCategory && matchesDay && matchesMonth && matchesYear;
   });
 
   return (
     <div className="space-y-6">
       {/* Search and Filters panel */}
-      <div className="bg-[#111111] p-5 rounded border border-[#222222] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-theme-card p-5 rounded border border-theme-card-border flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-muted" />
           <input
             type="text"
             placeholder="Pesquisar por descrição ou categoria..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] outline-none rounded text-sm text-white placeholder:text-gray-600 font-medium transition font-mono"
+            className="w-full pl-11 pr-4 py-2.5 bg-theme-input border border-theme-card-border focus:border-[#d4af37] outline-none rounded text-sm text-theme-title placeholder:text-theme-muted/50 font-medium transition font-mono animate-fade-in"
           />
         </div>
 
@@ -167,35 +200,59 @@ export default function TransactionsPanel({
           <select
             value={typeFilter}
             onChange={(e: any) => setTypeFilter(e.target.value)}
-            className="bg-[#0a0a0a] border border-[#222222] text-gray-300 text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
+            className="bg-theme-input border border-theme-card-border text-theme-text text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
           >
             <option value="all">Todos os Tipos</option>
             <option value="income">Entradas (+)</option>
             <option value="expense">Saídas (-)</option>
           </select>
 
+          {/* Filter Day */}
+          <select
+            value={dayFilter}
+            onChange={(e) => setDayFilter(e.target.value)}
+            className="bg-theme-input border border-theme-card-border text-theme-text text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
+          >
+            <option value="all">Todos os Dias</option>
+            {dayOptions.filter(d => d !== "all").map((d) => (
+              <option key={d} value={d}>
+                Dia {d}
+              </option>
+            ))}
+          </select>
+
           {/* Filter Month */}
           <select
             value={monthFilter}
             onChange={(e) => setMonthFilter(e.target.value)}
-            className="bg-[#0a0a0a] border border-[#222222] text-gray-300 text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
+            className="bg-theme-input border border-theme-card-border text-theme-text text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
           >
-            <option value="all">Todos os Meses</option>
-            {availableMonths.map((m) => {
-              const [year, month] = m.split("-");
-              return (
-                <option key={m} value={m}>
-                  {month}/{year}
-                </option>
-              );
-            })}
+            {monthOptions.map((mo) => (
+              <option key={mo.value} value={mo.value}>
+                {mo.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Filter Year */}
+          <select
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+            className="bg-theme-input border border-theme-card-border text-theme-text text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
+          >
+            <option value="all">Todos os Anos</option>
+            {availableYears.map((yr) => (
+              <option key={yr} value={yr}>
+                {yr}
+              </option>
+            ))}
           </select>
 
           {/* Filter Category */}
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-[#0a0a0a] border border-[#222222] text-gray-300 text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
+            className="bg-theme-input border border-theme-card-border text-theme-text text-xs font-semibold py-2.5 px-3.5 rounded outline-none focus:border-[#d4af37] transition cursor-pointer font-mono"
           >
             <option value="all">Todas as Categorias</option>
             {CATEGORIES.map((c) => (
@@ -216,11 +273,11 @@ export default function TransactionsPanel({
       </div>
 
       {/* Main Transactions Table */}
-      <div className="bg-[#111111] rounded border border-[#222222] overflow-hidden">
+      <div className="bg-theme-card rounded border border-theme-card-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#0c0c0c] border-b border-[#222222] text-gray-400 text-[10px] font-bold uppercase tracking-wider font-mono">
+              <tr className="bg-theme-table-header border-b border-theme-card-border text-theme-muted text-[10px] font-bold uppercase tracking-wider font-mono">
                 <th className="py-4 px-6">Data</th>
                 <th className="py-4 px-6">Descrição</th>
                 <th className="py-4 px-6">Categoria</th>
@@ -229,16 +286,16 @@ export default function TransactionsPanel({
                 <th className="py-4 px-6 text-center">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#222222] text-sm">
+            <tbody className="divide-y divide-theme-card-border text-sm">
               {filteredTransactions.length > 0 ? (
                 filteredTransactions
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .map((t) => (
-                    <tr key={t.id} className="hover:bg-[#161616] transition">
-                      <td className="py-4 px-6 font-mono text-xs text-gray-500">
+                    <tr key={t.id} className="hover:bg-theme-hover transition">
+                      <td className="py-4 px-6 font-mono text-xs text-theme-muted">
                         {t.date.split("-").reverse().join("/")}
                       </td>
-                      <td className="py-4 px-6 font-medium text-white">
+                      <td className="py-4 px-6 font-medium text-theme-title">
                         <div className="flex flex-col">
                           <span>{t.description}</span>
                           {t.isEmergencyReserve && (
@@ -249,7 +306,7 @@ export default function TransactionsPanel({
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <span className="bg-[#1f1f1f] text-gray-300 border border-[#333333] text-xs font-mono px-2 py-0.5 rounded">
+                        <span className="bg-theme-bg text-theme-text border border-theme-card-border text-xs font-mono px-2 py-0.5 rounded">
                           {t.category}
                         </span>
                       </td>
@@ -283,7 +340,7 @@ export default function TransactionsPanel({
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleEditClick(t)}
-                            className="p-1.5 text-gray-500 hover:text-[#d4af37] hover:bg-[#1c1c1c] rounded transition cursor-pointer"
+                            className="p-1.5 text-theme-muted hover:text-[#d4af37] hover:bg-theme-hover rounded transition cursor-pointer"
                             title="Editar lançamento"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -294,7 +351,7 @@ export default function TransactionsPanel({
                                 onDeleteTransaction(t.id);
                               }
                             }}
-                            className="p-1.5 text-gray-500 hover:text-rose-400 hover:bg-rose-950/20 rounded transition cursor-pointer"
+                            className="p-1.5 text-theme-muted hover:text-rose-400 hover:bg-rose-950/20 rounded transition cursor-pointer"
                             title="Excluir lançamento"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -305,7 +362,7 @@ export default function TransactionsPanel({
                   ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500 font-mono uppercase tracking-wider text-xs">
+                  <td colSpan={6} className="py-12 text-center text-theme-muted font-mono uppercase tracking-wider text-xs">
                     Nenhum lançamento registrado para estes filtros.
                   </td>
                 </tr>
@@ -318,9 +375,9 @@ export default function TransactionsPanel({
       {/* Add / Edit Form Modal */}
       {(showAddForm || editingItem) && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-[#111111] border border-[#222222] rounded shadow-2xl w-full max-w-lg overflow-hidden">
-            <div className="bg-[#0a0a0a] border-b border-[#222222] px-6 py-4 flex items-center justify-between">
-              <h3 className="font-bold text-white text-base uppercase tracking-wider serif-heading">
+          <div className="bg-theme-card border border-theme-card-border rounded shadow-2xl w-full max-w-lg overflow-hidden transition-all duration-300">
+            <div className="bg-theme-sidebar border-b border-theme-card-border px-6 py-4 flex items-center justify-between">
+              <h3 className="font-bold text-theme-title text-base uppercase tracking-wider serif-heading">
                 {editingItem ? "Editar Lançamento" : "Novo Lançamento Financeiro"}
               </h3>
               <button
@@ -329,7 +386,7 @@ export default function TransactionsPanel({
                   setEditingItem(null);
                   if (onCloseAddModal) onCloseAddModal();
                 }}
-                className="p-1.5 text-gray-500 hover:text-white rounded transition cursor-pointer"
+                className="p-1.5 text-theme-muted hover:text-theme-title rounded transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -337,14 +394,14 @@ export default function TransactionsPanel({
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               {/* Type Switcher */}
-              <div className="grid grid-cols-2 gap-2 bg-[#070707] p-1 border border-[#222222] rounded">
+              <div className="grid grid-cols-2 gap-2 bg-theme-bg p-1 border border-theme-card-border rounded">
                 <button
                   type="button"
                   onClick={() => setFormType("expense")}
                   className={`py-2 px-4 rounded font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
                     formType === "expense"
-                      ? "bg-[#1c1c1c] text-rose-400 border border-rose-900/30 shadow-sm"
-                      : "text-gray-500 hover:text-gray-300"
+                      ? "bg-theme-card text-rose-400 border border-rose-900/30 shadow-sm"
+                      : "text-theme-muted hover:text-theme-title"
                   }`}
                 >
                   <ArrowDownRight className="h-4 w-4" />
@@ -355,8 +412,8 @@ export default function TransactionsPanel({
                   onClick={() => setFormType("income")}
                   className={`py-2 px-4 rounded font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
                     formType === "income"
-                      ? "bg-[#1c1c1c] text-emerald-400 border border-emerald-900/30 shadow-sm"
-                      : "text-gray-500 hover:text-gray-300"
+                      ? "bg-theme-card text-emerald-400 border border-emerald-900/30 shadow-sm"
+                      : "text-theme-muted hover:text-theme-title"
                   }`}
                 >
                   <ArrowUpRight className="h-4 w-4" />
@@ -367,13 +424,13 @@ export default function TransactionsPanel({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Category Selector */}
                 <div>
-                  <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                  <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                     Categoria
                   </label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-white font-medium text-sm focus:ring-0 transition cursor-pointer font-mono"
+                    className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-medium text-sm focus:ring-0 transition cursor-pointer font-mono"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -385,7 +442,7 @@ export default function TransactionsPanel({
 
                 {/* Amount */}
                 <div>
-                  <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                  <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                     Valor (R$)
                   </label>
                   <input
@@ -396,7 +453,7 @@ export default function TransactionsPanel({
                     value={formAmount}
                     onChange={(e) => setFormAmount(e.target.value)}
                     placeholder="0,00"
-                    className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-white font-mono font-medium text-sm transition"
+                    className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-mono font-medium text-sm transition"
                   />
                 </div>
               </div>
@@ -404,7 +461,7 @@ export default function TransactionsPanel({
               {/* Custom Category Input (if Outros is selected) */}
               {formCategory === "Outros" && (
                 <div className="animate-fade-in">
-                  <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                  <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                     Nome da Categoria Personalizada
                   </label>
                   <input
@@ -413,7 +470,7 @@ export default function TransactionsPanel({
                     value={formCustomCategory}
                     onChange={(e) => setFormCustomCategory(e.target.value)}
                     placeholder="Ex: Presentes, Academia, Pet, etc."
-                    className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-white font-medium text-sm transition font-mono"
+                    className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-medium text-sm transition font-mono"
                   />
                 </div>
               )}
@@ -421,7 +478,7 @@ export default function TransactionsPanel({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Date Picker */}
                 <div>
-                  <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                  <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                     Data do Lançamento
                   </label>
                   <input
@@ -429,22 +486,22 @@ export default function TransactionsPanel({
                     required
                     value={formDate}
                     onChange={(e) => setFormDate(e.target.value)}
-                    className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-white font-mono font-medium text-sm transition"
+                    className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-mono font-medium text-sm transition"
                   />
                 </div>
 
                 {/* Link to Emergency Reserve */}
                 <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2.5 cursor-pointer bg-[#0a0a0a] border border-[#222222] hover:border-[#d4af37]/40 w-full py-2.5 px-3.5 rounded transition">
+                  <label className="flex items-center gap-2.5 cursor-pointer bg-theme-input border border-theme-card-border hover:border-[#d4af37]/40 w-full py-2.5 px-3.5 rounded transition">
                     <input
                       type="checkbox"
                       checked={formIsEmergency}
                       onChange={(e) => setFormIsEmergency(e.target.checked)}
-                      className="rounded border-[#333333] text-[#d4af37] focus:ring-0 focus:ring-offset-0 bg-[#0a0a0a] h-4 w-4"
+                      className="rounded border-theme-card-border text-[#d4af37] focus:ring-0 focus:ring-offset-0 bg-theme-input h-4 w-4"
                     />
                     <div className="flex flex-col">
-                      <span className="text-gray-300 font-bold text-xs">Reserva de Segurança</span>
-                      <span className="text-[9px] text-gray-500 font-mono">Vincular a este fundo</span>
+                      <span className="text-theme-text font-bold text-xs">Reserva de Segurança</span>
+                      <span className="text-[9px] text-theme-muted font-mono">Vincular a este fundo</span>
                     </div>
                   </label>
                 </div>
@@ -452,7 +509,7 @@ export default function TransactionsPanel({
 
               {/* Description */}
               <div>
-                <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                   Descrição / Detalhes
                 </label>
                 <input
@@ -460,12 +517,12 @@ export default function TransactionsPanel({
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Ex: Uber para o aeroporto, Dividendos recebidos, etc."
-                  className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-white font-medium text-sm transition"
+                  className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-medium text-sm transition"
                 />
               </div>
 
               {/* Footer Actions */}
-              <div className="pt-4 border-t border-[#222222] flex items-center justify-end gap-3">
+              <div className="pt-4 border-t border-theme-card-border flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -473,7 +530,7 @@ export default function TransactionsPanel({
                     setEditingItem(null);
                     if (onCloseAddModal) onCloseAddModal();
                   }}
-                  className="bg-[#1c1c1c] hover:bg-[#252525] border border-[#333333] text-gray-300 text-xs font-bold uppercase tracking-wider py-2.5 px-4.5 rounded transition cursor-pointer"
+                  className="bg-theme-bg hover:bg-theme-hover border border-theme-card-border text-theme-text text-xs font-bold uppercase tracking-wider py-2.5 px-4.5 rounded transition cursor-pointer"
                 >
                   Cancelar
                 </button>

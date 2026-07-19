@@ -1,19 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+:root {
+  --bg-main: #050505;
+  --bg-card: #111111;
+  --bg-sidebar: #0a0a0a;
+  --bg-header: #070707;
+  --border-main: #1a1a1a;
+  --border-card: #222222;
+  --text-main: #e5e5e5;
+  --text-muted: #9ca3af;
+  --text-title: #ffffff;
+  --bg-input: #0a0a0a;
+  --bg-table-header: #0c0c0c;
+  --bg-hover: #161616;
+}
+
+.light-theme {
+  --bg-main: #faf9f6;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f5f4f0;
+  --bg-header: #fcfbfa;
+  --border-main: #e8e6df;
+  --border-card: #efede6;
+  --text-main: #1a1917;
+  --text-muted: #6e6b64;
+  --text-title: #121110;
+  --bg-input: #ffffff;
+  --bg-table-header: #f3f1eb;
+  --bg-hover: #f6f4ee;
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Georgia", ui-serif, Cambria, "Times New Roman", Times, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-theme-bg: var(--bg-main);
+  --color-theme-card: var(--bg-card);
+  --color-theme-sidebar: var(--bg-sidebar);
+  --color-theme-header: var(--bg-header);
+  --color-theme-border: var(--border-main);
+  --color-theme-card-border: var(--border-card);
+  --color-theme-text: var(--text-main);
+  --color-theme-muted: var(--text-muted);
+  --color-theme-title: var(--text-title);
+  --color-theme-input: var(--bg-input);
+  --color-theme-table-header: var(--bg-table-header);
+  --color-theme-hover: var(--bg-hover);
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
-    background-color: #050505;
-    color: #e5e5e5;
+    background-color: var(--bg-main);
+    color: var(--text-main);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 

@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { sha256, decryptData, encryptData } from "../lib/crypto";
 import { getSeedData } from "../lib/seed";
 import { FinancialState, UserSession } from "../types";
-import { Lock, Eye, EyeOff, ShieldCheck, TrendingUp, Sparkles } from "lucide-react";
+import { Lock, Eye, EyeOff, ShieldCheck, TrendingUp, Sparkles, Sun, Moon } from "lucide-react";
 
 interface LoginProps {
   onLoginSuccess: (session: UserSession, decryptedData: FinancialState) => void;
+  theme?: "dark" | "light";
+  onToggleTheme?: () => void;
 }
 
-export default function Login({ onLoginSuccess }: LoginProps) {
+export default function Login({ onLoginSuccess, theme = "dark", onToggleTheme }: LoginProps) {
   const [username, setUsername] = useState("rifraeli");
   const [password, setPassword] = useState("milhao123");
   const [showPassword, setShowPassword] = useState(false);
@@ -115,17 +117,28 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#050505] px-4 py-12 relative overflow-hidden font-sans">
+    <div className="min-h-screen flex items-center justify-center bg-theme-bg text-theme-text px-4 py-12 relative overflow-hidden font-sans">
       {/* Delicate premium accent glow */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#d4af37]/5 rounded-full filter blur-3xl" />
 
-      <div className="w-full max-w-md bg-[#111111] border border-[#222222] rounded shadow-2xl p-8 z-10 transition-all duration-300">
+      <div className="w-full max-w-md bg-theme-card border border-theme-card-border rounded shadow-2xl p-8 z-10 transition-all duration-300 relative">
+        {/* Theme toggle in Login Card */}
+        {onToggleTheme && (
+          <button
+            onClick={onToggleTheme}
+            className="absolute top-6 right-6 p-2 rounded-lg bg-theme-bg border border-theme-card-border text-theme-muted hover:text-theme-title transition cursor-pointer"
+            title={theme === "dark" ? "Ativar Modo Claro" : "Ativar Modo Escuro"}
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4 text-[#d4af37]" /> : <Moon className="h-4 w-4 text-[#6e6b64]" />}
+          </button>
+        )}
+
         <div className="text-center mb-8">
           <div className="mb-4">
             <h1 className="serif-heading text-4xl font-bold text-[#d4af37] tracking-tighter italic">RIFRAELI</h1>
-            <p className="text-[10px] tracking-[0.25em] text-gray-500 uppercase font-bold mt-1">PRESTIGE FINANCE</p>
+            <p className="text-[10px] tracking-[0.25em] text-theme-muted uppercase font-bold mt-1">PRESTIGE FINANCE</p>
           </div>
-          <p className="text-gray-400 mt-2 text-xs uppercase tracking-wider font-mono">
+          <p className="text-theme-text mt-2 text-xs uppercase tracking-wider font-mono">
             Auditoria & Gestão Patrimonial Blindada
           </p>
         </div>
@@ -146,7 +159,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2 font-mono">
+            <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-2 font-mono">
               Nome de Usuário
             </label>
             <input
@@ -154,18 +167,18 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Ex: rifraeli"
-              className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] text-white rounded py-3 px-4 outline-none transition-all placeholder:text-gray-700 font-medium font-mono text-sm"
+              className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] text-theme-text rounded py-3 px-4 outline-none transition-all placeholder:text-theme-muted/50 font-medium font-mono text-sm"
               disabled={loading}
             />
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-gray-400 text-[10px] font-bold uppercase tracking-wider font-mono">
+              <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider font-mono">
                 Senha de Acesso
               </label>
               {username === "rifraeli" && (
-                <span className="text-gray-600 text-[10px] font-mono">milhao123</span>
+                <span className="text-theme-muted text-[10px] font-mono">milhao123</span>
               )}
             </div>
             <div className="relative">
@@ -174,13 +187,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-[#0a0a0a] border border-[#222222] focus:border-[#d4af37] text-white rounded py-3 pl-4 pr-12 outline-none transition-all placeholder:text-gray-700 font-mono text-sm"
+                className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] text-theme-text rounded py-3 pl-4 pr-12 outline-none transition-all placeholder:text-theme-muted/50 font-mono text-sm"
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-title"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -202,7 +215,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-[#222222] flex flex-col items-center gap-4 text-center">
+        <div className="mt-8 pt-6 border-t border-theme-card-border flex flex-col items-center gap-4 text-center">
           <button
             onClick={() => {
               setIsRegisterMode(!isRegisterMode);
@@ -214,7 +227,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             {isRegisterMode ? "Possui conta? Acessar" : "Cadastrar Nova Conta Criptografada"}
           </button>
 
-          <div className="flex items-center gap-2 text-[9px] text-gray-500 font-mono uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[9px] text-theme-muted font-mono uppercase tracking-widest">
             <Lock className="h-3 w-3 text-[#d4af37]" />
             <span>RSA-4096 + AES-GCM-256 CLIENT SECURE</span>
           </div>

@@ -34,9 +34,21 @@ import {
   ShieldCheck,
   RefreshCw,
   Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 export default function App() {
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    return (localStorage.getItem("rifraeli_theme") as "dark" | "light") || "dark";
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("rifraeli_theme", nextTheme);
+  };
+
   const [session, setSession] = useState<UserSession | null>(null);
   const [data, setData] = useState<FinancialState | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");
@@ -275,7 +287,11 @@ export default function App() {
   // ---------------------------------------------------------------------------
 
   if (!session || !data) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <div className={theme === "light" ? "light-theme" : ""}>
+        <Login onLoginSuccess={handleLoginSuccess} theme={theme} onToggleTheme={toggleTheme} />
+      </div>
+    );
   }
 
   // Navigation Links definition
@@ -289,14 +305,14 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col md:flex-row relative">
+    <div className={`min-h-screen ${theme === "light" ? "light-theme" : ""} bg-theme-bg text-theme-text flex flex-col md:flex-row relative transition-colors duration-300`}>
       
       {/* 1. SIDEBAR (Persistent on Desktop, hidden on print) */}
-      <aside className="hidden md:flex flex-col w-[220px] bg-[#0a0a0a] border-r border-[#1a1a1a] flex-shrink-0 z-20 no-print p-6">
+      <aside className="hidden md:flex flex-col w-[220px] bg-theme-sidebar border-r border-theme-border flex-shrink-0 z-20 no-print p-6">
         {/* Brand/Title */}
         <div className="mb-10">
           <h1 className="serif-heading text-2xl font-bold text-[#d4af37] tracking-tighter italic">RIFRAELI</h1>
-          <p className="text-[9px] tracking-[0.2em] text-gray-500 font-semibold">PRESTIGE FINANCE</p>
+          <p className="text-[9px] tracking-[0.2em] text-theme-muted font-semibold">PRESTIGE FINANCE</p>
         </div>
 
         {/* Nav list */}
@@ -313,11 +329,11 @@ export default function App() {
                 }}
                 className={`w-full flex items-center gap-3 py-1.5 transition cursor-pointer text-left outline-none ${
                   isActive
-                    ? "text-white border-l-3 border-[#d4af37] pl-3 -ml-6 font-semibold"
-                    : "hover:text-white text-gray-500 pl-3 font-medium"
+                    ? "text-theme-title border-l-3 border-[#d4af37] pl-3 -ml-6 font-semibold"
+                    : "hover:text-theme-title text-theme-muted pl-3 font-medium"
                 }`}
               >
-                <IconComp className={`h-4 w-4 ${isActive ? "text-[#d4af37]" : "text-gray-500"}`} />
+                <IconComp className={`h-4 w-4 ${isActive ? "text-[#d4af37]" : "text-theme-muted"}`} />
                 <span className="text-sm">{item.name}</span>
               </button>
             );
@@ -325,13 +341,24 @@ export default function App() {
         </nav>
 
         {/* Sidebar Footer with Encryption metadata */}
-        <div className="mt-auto pt-6 border-t border-gray-900 space-y-4">
+        <div className="mt-auto pt-6 border-t border-theme-card-border space-y-4">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between bg-theme-bg hover:bg-theme-hover border border-theme-card-border text-[10px] uppercase tracking-wider font-bold py-2 px-3 rounded transition cursor-pointer text-theme-text"
+          >
+            <span className="flex items-center gap-2">
+              {theme === "dark" ? <Sun className="h-3.5 w-3.5 text-[#d4af37]" /> : <Moon className="h-3.5 w-3.5 text-[#6e6b64]" />}
+              <span>{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>
+            </span>
+          </button>
+
           <div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></div>
-              <span className="text-[10px] text-gray-400 uppercase tracking-widest font-mono">Sessão Segura</span>
+              <span className="text-[10px] text-theme-muted uppercase tracking-widest font-mono">Sessão Segura</span>
             </div>
-            <p className="text-[11px] mt-1 text-gray-600 font-mono">RSA-4096: AES-256-GCM</p>
+            <p className="text-[11px] mt-1 text-theme-muted font-mono">RSA-4096: AES-256-GCM</p>
           </div>
 
           {/* Sync indicator */}
@@ -355,7 +382,7 @@ export default function App() {
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-[#111111] hover:bg-rose-950/20 border border-[#222222] hover:border-rose-900/30 text-[10px] uppercase tracking-wider font-bold py-2 px-3 rounded transition cursor-pointer text-gray-400"
+            className="w-full flex items-center justify-center gap-2 bg-theme-card hover:bg-rose-950/20 border border-theme-card-border hover:border-rose-900/30 text-[10px] uppercase tracking-wider font-bold py-2 px-3 rounded transition cursor-pointer text-theme-muted"
           >
             <LogOut className="h-3.5 w-3.5" />
             <span>Sair</span>
@@ -364,10 +391,10 @@ export default function App() {
       </aside>
 
       {/* 2. MOBILE HEADER & NAVIGATION (Hidden during print) */}
-      <header className="md:hidden flex items-center justify-between h-16 bg-[#070707] text-white px-4 border-b border-[#1a1a1a] z-30 no-print flex-shrink-0">
+      <header className="md:hidden flex items-center justify-between h-16 bg-theme-header text-theme-title px-4 border-b border-theme-border z-30 no-print flex-shrink-0">
         <div className="flex flex-col">
           <span className="serif-heading text-lg font-bold text-[#d4af37] italic leading-none">RIFRAELI</span>
-          <span className="text-[8px] tracking-[0.1em] text-gray-500 mt-1 uppercase font-semibold">PRESTIGE FINANCE</span>
+          <span className="text-[8px] tracking-[0.1em] text-theme-muted mt-1 uppercase font-semibold">PRESTIGE FINANCE</span>
         </div>
 
         {/* Status Indicator */}
@@ -377,7 +404,7 @@ export default function App() {
           
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-1 text-slate-300 hover:text-white"
+            className="p-1 text-theme-muted hover:text-theme-title"
           >
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -388,12 +415,12 @@ export default function App() {
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40 no-print" onClick={() => setIsMobileMenuOpen(false)}>
           <div
-            className="absolute left-0 top-0 bottom-0 w-64 bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col p-6 space-y-4"
+            className="absolute left-0 top-0 bottom-0 w-64 bg-theme-sidebar border-r border-theme-border flex flex-col p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6">
               <h1 className="serif-heading text-xl font-bold text-[#d4af37] italic">RIFRAELI</h1>
-              <p className="text-[8px] tracking-[0.2em] text-gray-500 uppercase font-semibold">PRESTIGE FINANCE</p>
+              <p className="text-[8px] tracking-[0.2em] text-theme-muted uppercase font-semibold">PRESTIGE FINANCE</p>
             </div>
 
             <nav className="flex-1 space-y-4">
@@ -409,8 +436,8 @@ export default function App() {
                     }}
                     className={`w-full flex items-center gap-3 py-1 text-left ${
                       isActive
-                        ? "text-white border-l-2 border-[#d4af37] pl-3 -ml-4 font-semibold"
-                        : "text-gray-500 hover:text-white pl-3"
+                        ? "text-theme-title border-l-2 border-[#d4af37] pl-3 -ml-4 font-semibold"
+                        : "text-theme-muted hover:text-theme-title pl-3"
                     }`}
                   >
                     <IconComp className="h-4 w-4" />
@@ -420,14 +447,25 @@ export default function App() {
               })}
             </nav>
 
-            <div className="pt-6 border-t border-gray-900 space-y-4">
+            <div className="pt-6 border-t border-theme-card-border space-y-4">
+              {/* Mobile Drawer Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-between bg-theme-bg border border-theme-card-border text-[10px] uppercase tracking-wider font-bold py-2 px-3 rounded transition cursor-pointer text-theme-text"
+              >
+                <span className="flex items-center gap-2">
+                  {theme === "dark" ? <Sun className="h-3.5 w-3.5 text-[#d4af37]" /> : <Moon className="h-3.5 w-3.5 text-[#6e6b64]" />}
+                  <span>{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>
+                </span>
+              </button>
+
               <div className="flex items-center gap-2">
                 <div className="status-dot h-2 w-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></div>
-                <span className="text-[9px] text-gray-400 uppercase tracking-widest font-mono">Sessão Segura</span>
+                <span className="text-[9px] text-theme-muted uppercase tracking-widest font-mono">Sessão Segura</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 bg-[#111111] border border-[#222222] text-xs font-bold py-2 px-3 rounded text-gray-400"
+                className="w-full flex items-center justify-center gap-2 bg-theme-card border border-theme-card-border text-xs font-bold py-2 px-3 rounded text-theme-muted"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Desconectar</span>
@@ -440,16 +478,26 @@ export default function App() {
       {/* 3. MAIN WORKSPACE */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Prestige Header Bar */}
-        <header className="hidden md:flex h-16 border-b border-[#1a1a1a] items-center justify-between px-8 bg-[#070707] no-print flex-shrink-0">
+        <header className="hidden md:flex h-16 border-b border-theme-border items-center justify-between px-8 bg-theme-header no-print flex-shrink-0">
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-500 uppercase tracking-widest">Usuário:</span>
-            <span className="text-xs text-white font-semibold font-mono">{session.username}</span>
+            <span className="text-xs text-theme-muted uppercase tracking-widest">Usuário:</span>
+            <span className="text-xs text-theme-title font-semibold font-mono">{session.username}</span>
           </div>
           <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2 text-[10px] text-gray-500 font-mono tracking-wider">
+            <div className="flex items-center space-x-2 text-[10px] text-theme-muted font-mono tracking-wider">
               <Lock className="w-3.5 h-3.5 text-[#d4af37]" />
               <span>CRIPTOGRAFIA ATIVA (E2EE)</span>
             </div>
+
+            {/* Elegant theme toggle button in Desktop Top Bar */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-theme-bg border border-theme-card-border text-theme-muted hover:text-theme-title transition cursor-pointer"
+              title={theme === "dark" ? "Ativar Modo Claro" : "Ativar Modo Escuro"}
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4 text-[#d4af37]" /> : <Moon className="h-4 w-4 text-[#6e6b64]" />}
+            </button>
+
             <button
               onClick={() => {
                 setActiveTab("transactions");
@@ -464,17 +512,17 @@ export default function App() {
 
         <main className="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full flex flex-col">
           {/* Dynamic header row (Hidden during print) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1a1a1a] pb-5 mb-6 no-print">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-theme-border pb-5 mb-6 no-print">
             <div>
               <span className="text-[10px] text-[#d4af37] font-bold uppercase tracking-wider font-mono">
                 Auditoria Blindada & Gestão Prestige
               </span>
-              <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 serif-heading italic">
+              <h2 className="text-xl md:text-2xl font-bold text-theme-title flex items-center gap-2 serif-heading italic">
                 <span>{navItems.find((n) => n.id === activeTab)?.name}</span>
               </h2>
             </div>
 
-            <div className="flex items-center gap-2 text-xs bg-[#111111] text-gray-400 font-semibold py-2 px-4 rounded-xl border border-[#222222]">
+            <div className="flex items-center gap-2 text-xs bg-theme-card text-theme-muted font-semibold py-2 px-4 rounded-xl border border-theme-card-border">
               <Lock className="h-4 w-4 text-[#d4af37]" />
               <span>RSA-4096 Client Encrypted</span>
             </div>
