@@ -59,10 +59,13 @@ export default function App() {
 
   const [session, setSession] = useState<UserSession | null>(null);
   const [data, setData] = useState<FinancialState | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return localStorage.getItem("rifraeli_active_tab") || "overview";
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [savingStatus, setSavingStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [isExternalAddModalOpen, setIsExternalAddModalOpen] = useState(false);
+  const [isRestoringSession, setIsRestoringSession] = useState(true);
 
   // Auto-save function whenever data changes (non-blocking, client-encrypted)
   const saveFinancialData = async (updatedState: FinancialState) => {
@@ -95,10 +98,68 @@ export default function App() {
     }
   };
 
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const restoreSession = async () => {
+      const savedSessionStr = localStorage.getItem("rifraeli_session");
+      if (savedSessionStr) {
+        try {
+          const savedSession = JSON.parse(savedSessionStr) as UserSession;
+          if (savedSession.username && savedSession.passwordHash && savedSession.rawPassword) {
+            const response = await fetch("/api/auth/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                username: savedSession.username,
+                passwordHash: savedSession.passwordHash,
+              }),
+            });
+
+            if (response.ok) {
+              const resData = await response.json();
+              
+              const { decryptData } = await import("./lib/crypto");
+              const { getSeedData } = await import("./lib/seed");
+              
+              let decryptedState: FinancialState;
+              if (!resData.encryptedData) {
+                decryptedState = getSeedData();
+              } else {
+                const decrypted = await decryptData(resData.encryptedData, savedSession.rawPassword);
+                if (decrypted) {
+                  decryptedState = decrypted;
+                } else {
+                  throw new Error("Falha ao descriptografar dados");
+                }
+              }
+
+              setSession(savedSession);
+              setData(decryptedState);
+              setSavingStatus("saved");
+            } else {
+              localStorage.removeItem("rifraeli_session");
+            }
+          }
+        } catch (err) {
+          console.error("Erro ao restaurar sessão automática:", err);
+          localStorage.removeItem("rifraeli_session");
+        }
+      }
+      setIsRestoringSession(false);
+    };
+
+    restoreSession();
+  }, []);
+
+  // Save active tab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("rifraeli_active_tab", activeTab);
+  }, [activeTab]);
+
   const handleLoginSuccess = (userSession: UserSession, decryptedData: FinancialState) => {
     setSession(userSession);
     setData(decryptedData);
-    setActiveTab("overview");
+    localStorage.setItem("rifraeli_session", JSON.stringify(userSession));
     setSavingStatus("saved");
   };
 
@@ -106,6 +167,7 @@ export default function App() {
     // Clear all states and sensitive memory values
     setSession(null);
     setData(null);
+    localStorage.removeItem("rifraeli_session");
     setActiveTab("overview");
     setSavingStatus("idle");
     setIsMobileMenuOpen(false);
@@ -294,6 +356,21 @@ export default function App() {
   // INTERFACES & SHELL
   // ---------------------------------------------------------------------------
 
+  if (isRestoringSession) {
+    return (
+      <div className={`min-h-screen flex flex-col items-center justify-center bg-theme-bg text-theme-text font-sans ${theme === "light" ? "light-theme" : ""}`}>
+        <div className="text-center space-y-4 animate-pulse">
+          <h1 className="serif-heading text-3xl font-bold text-[#d4af37] tracking-tighter italic">RIFRAELI</h1>
+          <p className="text-[10px] tracking-[0.25em] text-theme-muted uppercase font-bold">PRESTIGE FINANCE</p>
+          <div className="flex items-center justify-center gap-2 text-xs font-mono text-theme-muted pt-4">
+            <RefreshCw className="h-4 w-4 animate-spin text-[#d4af37]" />
+            <span>Descriptografando carteira blindada...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!session || !data) {
     return (
       <div className={theme === "light" ? "light-theme" : ""}>
@@ -401,20 +478,32 @@ export default function App() {
       {/* 2. MOBILE HEADER & NAVIGATION (Hidden during print) */}
       <header className="md:hidden flex items-center justify-between h-16 bg-theme-header text-theme-title px-4 border-b border-theme-border z-30 no-print flex-shrink-0">
         <div className="flex flex-col">
-          <span className="serif-heading text-lg font-bold text-[#d4af37] italic leading-none">RIFRAELI</span>
-          <span className="text-[8px] tracking-[0.1em] text-theme-muted mt-1 uppercase font-semibold">FINANCEIRO</span>
+          <span className="serif-heading text-base font-bold text-[#d4af37] italic leading-none">RIFRAELI</span>
+          <span className="text-[7px] tracking-[0.12em] text-theme-muted mt-1 uppercase font-semibold">FINANCEIRO</span>
         </div>
 
-        {/* Status Indicator */}
+        {/* Action Button & Status Indicator */}
         <div className="flex items-center gap-3">
-          {savingStatus === "saving" && <RefreshCw className="h-4 w-4 text-amber-400 animate-spin" />}
-          {savingStatus === "saved" && <div className="h-2 w-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></div>}
+          <button
+            onClick={() => {
+              setActiveTab("transactions");
+              setIsExternalAddModalOpen(true);
+            }}
+            className="px-2.5 py-1.5 rounded text-[9px] bg-[#d4af37] text-black font-extrabold uppercase tracking-wider hover:bg-[#c49f27] transition cursor-pointer flex items-center gap-1 active:scale-95"
+          >
+            <span>+ NOVO LANÇAMENTO</span>
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {savingStatus === "saving" && <RefreshCw className="h-3.5 w-3.5 text-amber-400 animate-spin" />}
+            {savingStatus === "saved" && <div className="h-1.5 w-1.5 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></div>}
+          </div>
           
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-1 text-theme-muted hover:text-theme-title"
           >
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </header>
