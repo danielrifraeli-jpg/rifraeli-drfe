@@ -9,6 +9,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Plus,
+  Trophy,
+  Target,
+  ShieldCheck,
 } from "lucide-react";
 import {
   BarChart,
@@ -187,33 +190,131 @@ export default function OverviewPanel({
 
       {/* Main Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Cash Flow Graph */}
-        <div id="chart-fluxo-caixa" className="bg-theme-card p-5 rounded border border-theme-card-border lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Fluxo de Caixa Mensal</h4>
-            <span className="text-[10px] font-medium text-theme-muted uppercase tracking-widest font-mono">Auditoria de Período</span>
+        <div className="lg:col-span-2 space-y-6">
+          {/* Cash Flow Graph */}
+          <div id="chart-fluxo-caixa" className="bg-theme-card p-5 rounded border border-theme-card-border">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Fluxo de Caixa Mensal</h4>
+              <span className="text-[10px] font-medium text-theme-muted uppercase tracking-widest font-mono">Auditoria de Período</span>
+            </div>
+            <div className="h-80 w-full">
+              {barData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-main)" />
+                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+                    <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+                    <Tooltip
+                      formatter={(value: any) => [formatBRL(Number(value)), ""]}
+                      contentStyle={{ backgroundColor: "var(--bg-input)", borderRadius: "4px", border: "1px solid var(--border-card)", color: "var(--text-main)" }}
+                    />
+                    <Legend iconType="circle" />
+                    <Bar dataKey="Receitas" fill="#d4af37" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="Despesas" fill="#f43f5e" radius={[2, 2, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-theme-muted">
+                  <p className="text-sm font-mono uppercase tracking-wider">Sem dados de transações históricos.</p>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="h-80 w-full">
-            {barData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-main)" />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-                  <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-                  <Tooltip
-                    formatter={(value: any) => [formatBRL(Number(value)), ""]}
-                    contentStyle={{ backgroundColor: "var(--bg-input)", borderRadius: "4px", border: "1px solid var(--border-card)", color: "var(--text-main)" }}
-                  />
-                  <Legend iconType="circle" />
-                  <Bar dataKey="Receitas" fill="#d4af37" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Despesas" fill="#f43f5e" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-theme-muted">
-                <p className="text-sm font-mono uppercase tracking-wider">Sem dados de transações históricos.</p>
+
+          {/* Metas Patrimoniais Geral */}
+          <div id="card-metas-visao-geral" className="bg-theme-card p-5 rounded border border-theme-card-border">
+            <div className="flex items-center justify-between mb-4 border-b border-theme-card-border pb-3">
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-[#d4af37]" />
+                <h4 className="font-bold text-theme-title text-sm uppercase tracking-wider serif-heading">Metas Patrimoniais & Cobertura</h4>
               </div>
-            )}
+              <button
+                onClick={() => onNavigateToTab("goals")}
+                className="text-xs font-semibold text-[#d4af37] hover:text-[#c49f27] hover:underline uppercase tracking-wider font-mono flex items-center gap-1 cursor-pointer"
+              >
+                Aportar & Gerenciar
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* 1. Reserva de Segurança / Fundo de Segurança block */}
+              <div className="bg-theme-bg p-4 rounded border border-theme-card-border flex flex-col justify-between hover:border-theme-border/50 transition">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] text-[#d4af37] font-bold uppercase tracking-wider font-mono flex items-center gap-1">
+                      <ShieldCheck className="h-3.5 w-3.5" /> Fundo de Segurança
+                    </span>
+                    <span className="text-xs font-bold font-mono text-[#d4af37]">{reserveProgressPercent.toFixed(1)}%</span>
+                  </div>
+                  <h5 className="text-xs font-bold text-theme-title uppercase font-mono tracking-wide">Reserva de Emergência Ideal</h5>
+                  <p className="text-[10px] text-theme-muted mt-1 leading-relaxed">
+                    Custo de vida mensal: <strong className="font-mono text-theme-title">{formatBRL(avgMonthlyExpense)}</strong> (Fator: {emergencyReserve.monthlyExpenseFactor}x)
+                  </p>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  {/* Progress bar */}
+                  <div className="w-full h-2 bg-theme-input border border-theme-card-border rounded overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-600 to-[#d4af37] rounded transition-all duration-500"
+                      style={{ width: `${Math.min(reserveProgressPercent, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-theme-muted font-mono">
+                    <span>{formatBRL(emergencyAmount)}</span>
+                    <span>Alvo: {formatBRL(targetReserve)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Custom dynamic goals list */}
+              {goals.map((g) => {
+                const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0;
+                return (
+                  <div key={g.id} className="bg-theme-bg p-4 rounded border border-theme-card-border flex flex-col justify-between hover:border-theme-border/50 transition">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] text-theme-muted font-bold uppercase tracking-wider font-mono flex items-center gap-1">
+                          <Target className="h-3.5 w-3.5 text-theme-muted" /> Meta Patrimonial
+                        </span>
+                        <span className={`text-xs font-bold font-mono ${pct >= 100 ? "text-emerald-400" : "text-[#d4af37]"}`}>
+                          {pct.toFixed(1)}%
+                        </span>
+                      </div>
+                      <h5 className="text-xs font-bold text-theme-title uppercase font-mono tracking-wide truncate" title={g.name}>
+                        {g.name}
+                      </h5>
+                      <p className="text-[10px] text-theme-muted mt-1 leading-relaxed">
+                        Prazo: <span className="font-mono text-theme-title">{g.deadline.split("-").reverse().join("/")}</span>
+                      </p>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      {/* Progress bar */}
+                      <div className="w-full h-2 bg-theme-input border border-theme-card-border rounded overflow-hidden">
+                        <div
+                          className={`h-full rounded transition-all duration-500 ${pct >= 100 ? "bg-emerald-500" : "bg-gradient-to-r from-amber-600 to-[#d4af37]"}`}
+                          style={{ width: `${Math.min(pct, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[10px] text-theme-muted font-mono">
+                        <span>{formatBRL(g.currentAmount)}</span>
+                        <span>Alvo: {formatBRL(g.targetAmount)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* If there are no custom goals, show a placeholder */}
+              {goals.length === 0 && (
+                <div className="bg-theme-bg p-4 rounded border border-dashed border-theme-card-border flex flex-col items-center justify-center text-center py-6">
+                  <Target className="h-6 w-6 text-theme-muted mb-2 opacity-55" />
+                  <p className="text-[10px] text-theme-muted uppercase tracking-wider font-mono font-bold">Nenhuma outra meta cadastrada</p>
+                  <p className="text-[9px] text-theme-muted/80 max-w-[200px] mt-1">Crie metas personalizadas na aba de Metas Patrimoniais para acompanhar aqui.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

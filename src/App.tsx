@@ -554,6 +554,10 @@ export default function App() {
                 onDeleteTransaction={handleDeleteTransaction}
                 isAddModalOpen={isExternalAddModalOpen}
                 onCloseAddModal={() => setIsExternalAddModalOpen(false)}
+                goals={data.goals}
+                emergencyReserve={data.emergencyReserve}
+                onEditGoal={handleEditGoal}
+                onUpdateEmergencyReserve={handleUpdateEmergencyReserve}
               />
             )}
 
@@ -575,6 +579,7 @@ export default function App() {
                 onEditGoal={handleEditGoal}
                 onDeleteGoal={handleDeleteGoal}
                 onUpdateEmergencyReserve={handleUpdateEmergencyReserve}
+                onAddTransaction={handleAddTransaction}
               />
             )}
 

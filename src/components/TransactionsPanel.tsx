@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Transaction } from "../types";
+import { Transaction, FinancialGoal, EmergencyReserve } from "../types";
 import {
   Search,
   Filter,
@@ -19,6 +19,10 @@ interface TransactionsPanelProps {
   onDeleteTransaction: (id: string) => void;
   isAddModalOpen?: boolean;
   onCloseAddModal?: () => void;
+  goals?: FinancialGoal[];
+  emergencyReserve?: EmergencyReserve;
+  onEditGoal?: (id: string, g: Partial<FinancialGoal>) => void;
+  onUpdateEmergencyReserve?: (res: EmergencyReserve) => void;
 }
 
 const CATEGORIES = [
@@ -42,6 +46,10 @@ export default function TransactionsPanel({
   onDeleteTransaction,
   isAddModalOpen = false,
   onCloseAddModal,
+  goals = [],
+  emergencyReserve,
+  onEditGoal,
+  onUpdateEmergencyReserve,
 }: TransactionsPanelProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">("all");
@@ -55,13 +63,14 @@ export default function TransactionsPanel({
   const [editingItem, setEditingItem] = useState<Transaction | null>(null);
 
   // Form states
-  const [formType, setFormType] = useState<"income" | "expense">("expense");
+  const [formType, setFormType] = useState<"income" | "expense" | "contribution">("expense");
   const [formCategory, setFormCategory] = useState("Alimentação");
   const [formCustomCategory, setFormCustomCategory] = useState("");
   const [formAmount, setFormAmount] = useState("");
   const [formDate, setFormDate] = useState(new Date().toISOString().split("T")[0]);
   const [formDescription, setFormDescription] = useState("");
   const [formIsEmergency, setFormIsEmergency] = useState(false);
+  const [formContributionDest, setFormContributionDest] = useState<string>("reserve");
 
   const formatBRL = (val: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -133,6 +142,43 @@ export default function TransactionsPanel({
     const finalAmount = parseFloat(formAmount);
     if (isNaN(finalAmount) || finalAmount <= 0) {
       alert("Por favor, insira um valor válido maior que zero.");
+      return;
+    }
+
+    if (formType === "contribution") {
+      let destName = "";
+      let isEmergency = false;
+
+      if (formContributionDest === "reserve") {
+        destName = "Fundo de Segurança (Reserva Ideal)";
+        isEmergency = true;
+        if (emergencyReserve && onUpdateEmergencyReserve) {
+          onUpdateEmergencyReserve({
+            ...emergencyReserve,
+            currentAmount: emergencyReserve.currentAmount + finalAmount,
+          });
+        }
+      } else {
+        const selectedGoal = goals?.find((g) => g.id === formContributionDest);
+        if (selectedGoal && onEditGoal) {
+          destName = selectedGoal.name;
+          onEditGoal(selectedGoal.id, {
+            currentAmount: selectedGoal.currentAmount + finalAmount,
+          });
+        }
+      }
+
+      onAddTransaction({
+        type: "expense",
+        category: "Investimentos",
+        amount: finalAmount,
+        date: formDate,
+        description: formDescription.trim() || `Aporte: ${destName}`,
+        isEmergencyReserve: isEmergency,
+      });
+
+      setShowAddForm(false);
+      if (onCloseAddModal) onCloseAddModal();
       return;
     }
 
@@ -394,56 +440,96 @@ export default function TransactionsPanel({
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               {/* Type Switcher */}
-              <div className="grid grid-cols-2 gap-2 bg-theme-bg p-1 border border-theme-card-border rounded">
+              <div className={`grid ${editingItem ? "grid-cols-2" : "grid-cols-3"} gap-2 bg-theme-bg p-1 border border-theme-card-border rounded`}>
                 <button
                   type="button"
                   onClick={() => setFormType("expense")}
-                  className={`py-2 px-4 rounded font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
+                  className={`py-2 px-2 rounded font-bold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
                     formType === "expense"
                       ? "bg-theme-card text-rose-400 border border-rose-900/30 shadow-sm"
                       : "text-theme-muted hover:text-theme-title"
                   }`}
                 >
                   <ArrowDownRight className="h-4 w-4" />
-                  <span>Saída (Despesa)</span>
+                  <span>Despesa</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormType("income")}
-                  className={`py-2 px-4 rounded font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
+                  className={`py-2 px-2 rounded font-bold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
                     formType === "income"
                       ? "bg-theme-card text-emerald-400 border border-emerald-900/30 shadow-sm"
                       : "text-theme-muted hover:text-theme-title"
                   }`}
                 >
                   <ArrowUpRight className="h-4 w-4" />
-                  <span>Entrada (Receita)</span>
+                  <span>Receita</span>
                 </button>
+                {!editingItem && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormType("contribution");
+                      setFormCategory("Investimentos");
+                    }}
+                    className={`py-2 px-2 rounded font-bold text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition cursor-pointer outline-none ${
+                      formType === "contribution"
+                        ? "bg-theme-card text-[#d4af37] border border-amber-500/20 shadow-sm"
+                        : "text-theme-muted hover:text-theme-title"
+                    }`}
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Aporte</span>
+                  </button>
+                )}
               </div>
+
+              {/* Destination for contribution (if selected) */}
+              {formType === "contribution" && (
+                <div className="bg-theme-bg p-3.5 rounded border border-theme-card-border space-y-3 animate-fade-in">
+                  <div>
+                    <label className="block text-[#d4af37] text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                      Destino do Aporte
+                    </label>
+                    <select
+                      value={formContributionDest}
+                      onChange={(e) => setFormContributionDest(e.target.value)}
+                      className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2 px-3 outline-none text-theme-text font-mono text-xs cursor-pointer"
+                    >
+                      <option value="reserve">🛡️ Fundo de Segurança (Reserva Ideal)</option>
+                      {goals.map((g) => (
+                        <option key={g.id} value={g.id}>🎯 {g.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Category Selector */}
-                <div>
-                  <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
-                    Categoria
-                  </label>
-                  <select
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-medium text-sm focus:ring-0 transition cursor-pointer font-mono"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {formType !== "contribution" ? (
+                  <div>
+                    <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+                      Categoria
+                    </label>
+                    <select
+                      value={formCategory}
+                      onChange={(e) => setFormCategory(e.target.value)}
+                      className="w-full bg-theme-input border border-theme-card-border focus:border-[#d4af37] rounded py-2.5 px-3.5 outline-none text-theme-text font-medium text-sm focus:ring-0 transition cursor-pointer font-mono"
+                    >
+                      {CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : null}
 
                 {/* Amount */}
-                <div>
+                <div className={formType === "contribution" ? "sm:col-span-2" : ""}>
                   <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
-                    Valor (R$)
+                    {formType === "contribution" ? "Valor do Aporte (R$)" : "Valor (R$)"}
                   </label>
                   <input
                     type="number"
@@ -459,7 +545,7 @@ export default function TransactionsPanel({
               </div>
 
               {/* Custom Category Input (if Outros is selected) */}
-              {formCategory === "Outros" && (
+              {formType !== "contribution" && formCategory === "Outros" && (
                 <div className="animate-fade-in">
                   <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                     Nome da Categoria Personalizada
@@ -477,7 +563,7 @@ export default function TransactionsPanel({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Date Picker */}
-                <div>
+                <div className={formType === "contribution" ? "sm:col-span-2" : ""}>
                   <label className="block text-theme-muted text-[10px] font-bold uppercase tracking-wider mb-1.5 font-mono">
                     Data do Lançamento
                   </label>
@@ -491,20 +577,22 @@ export default function TransactionsPanel({
                 </div>
 
                 {/* Link to Emergency Reserve */}
-                <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2.5 cursor-pointer bg-theme-input border border-theme-card-border hover:border-[#d4af37]/40 w-full py-2.5 px-3.5 rounded transition">
-                    <input
-                      type="checkbox"
-                      checked={formIsEmergency}
-                      onChange={(e) => setFormIsEmergency(e.target.checked)}
-                      className="rounded border-theme-card-border text-[#d4af37] focus:ring-0 focus:ring-offset-0 bg-theme-input h-4 w-4"
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-theme-text font-bold text-xs">Reserva de Segurança</span>
-                      <span className="text-[9px] text-theme-muted font-mono">Vincular a este fundo</span>
-                    </div>
-                  </label>
-                </div>
+                {formType !== "contribution" && (
+                  <div className="flex items-end pb-1">
+                    <label className="flex items-center gap-2.5 cursor-pointer bg-theme-input border border-theme-card-border hover:border-[#d4af37]/40 w-full py-2.5 px-3.5 rounded transition">
+                      <input
+                        type="checkbox"
+                        checked={formIsEmergency}
+                        onChange={(e) => setFormIsEmergency(e.target.checked)}
+                        className="rounded border-theme-card-border text-[#d4af37] focus:ring-0 focus:ring-offset-0 bg-theme-input h-4 w-4"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-theme-text font-bold text-xs">Reserva de Segurança</span>
+                        <span className="text-[9px] text-theme-muted font-mono">Vincular a este fundo</span>
+                      </div>
+                    </label>
+                  </div>
+                )}
               </div>
 
               {/* Description */}
