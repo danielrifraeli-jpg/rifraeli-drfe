@@ -1,0 +1,6 @@
+{
+  "name": "Dashboard Financeiro com Criptografia de Ponta a Ponta",
+  "description": "Um painel de controle financeiro completo, altamente seguro com criptografia AES-GCM baseada em senha, para acompanhamento de receitas, despesas, investimentos, reserva de emergência e metas financeiras com análise de IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Georgia", ui-serif, Cambria, "Times New Roman", Times, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: #050505;
+    color: #e5e5e5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom design primitives matching prestige finance */
+.serif-heading {
+  font-family: var(--font-serif);
+}
+
+.gold-text {
+  color: #d4af37;
+}
+
+.gold-bg {
+  background-color: #d4af37;
+}
+
+.gold-border {
+  border-color: #d4af37;
+}
+
+.card-bg {
+  background-color: #111111;
+  border: 1px solid #222222;
+}
+
+/* Print-specific style layout to allow elegant PDF generation via the browser print dialog */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  /* Hide interactive/UI elements like sidebars, forms, and action buttons on print */
+  .no-print, 
+  nav, 
+  button, 
+  select, 
+  input, 
+  form,
+  .print-hide {
+    display: none !important;
+  }
+  
+  /* Make the print container occupy full-width */
+  .print-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Force display of chart grids or simple card borders on print */
+  .print-card {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid !important;
+  }
+}
